@@ -37,7 +37,8 @@ public class MultiSwitchBtn extends View {
 
     public enum BlockStyle {
         ORIGINAL(0),
-        BRIN(1);
+        BRIN(1),
+        ROUNDED(2);
 
         private int mValue;
 
@@ -199,6 +200,8 @@ public class MultiSwitchBtn extends View {
 //                draw selected tab
                 if (mblockStyle == BlockStyle.BRIN) {
                     drawSquarePath(canvas, top, left, bottom, right, i);
+                } else if (mblockStyle == BlockStyle.ROUNDED) {
+                    drawPath(canvas, top, perWidth * i, bottom, perWidth * (i + 1));
                 }
                 // draw selected text
                 canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
