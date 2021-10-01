@@ -387,6 +387,76 @@ public class MultiSwitchBtn extends View {
         return this;
     }
 
+    /*=========================================Set and Get=========================================*/
+
+    /**
+     * get position of selected tab
+     */
+    public int getSelectedTab() {
+        return mSelectedTab;
+    }
+
+    /**
+     * set selected tab
+     *
+     * @param mSelectedTab
+     * @return
+     */
+    public MultiSwitchBtn setSelectedTab(int mSelectedTab) {
+        this.mSelectedTab = mSelectedTab;
+        invalidate();
+        if (onSwitchListener != null) {
+            onSwitchListener.onSwitch(mSelectedTab, mTabTexts[mSelectedTab]);
+        }
+        return this;
+    }
+
+    public void clearSelection() {
+        this.mSelectedTab = -1;
+        invalidate();
+    }
+
+    public MultiSwitchBtn setSelectColor(int selectColor) {
+        mSelectedColor = selectColor;
+        requestLayout();
+        return this;
+    }
+
+    public MultiSwitchBtn setUnSelectColor(int unSelectColor) {
+        mUnSelectedColor = unSelectColor;
+        requestLayout();
+        return this;
+    }
+
+    public MultiSwitchBtn setSelectTextColor(int selectTextColor) {
+        mSelectedTextColor = selectTextColor;
+        requestLayout();
+        return this;
+    }
+
+    public MultiSwitchBtn setUnSelectTextColor(int unSelectTextColor) {
+        mUnSelectedTextColor = unSelectTextColor;
+        requestLayout();
+        return this;
+    }
+
+    /**
+     * set data for the switchbutton
+     *
+     * @param tagTexts
+     * @return
+     */
+
+    public MultiSwitchBtn setText(String... tagTexts) {
+        if (tagTexts.length > 0) {
+            this.mTabTexts = tagTexts;
+            mTabNum = tagTexts.length;
+            requestLayout();
+            return this;
+        } else {
+            throw new IllegalArgumentException("the size of tagTexts should greater then 0");
+        }
+    }
     /*======================================save and restore======================================*/
 
     @Override
