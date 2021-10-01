@@ -2,7 +2,10 @@ package com.featheryi.multiswitchbtn;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -138,6 +141,110 @@ public class MultiSwitchBtn extends View {
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (!mEnable) {
+            mStrokePaint.setColor(mDisableColor);
+            mFillPaint.setColor(mDisableColor);
+            mSelectedTextPaint.setColor(mDisableTextColor);
+            mUnselectedTextPaint.setColor(mDisableTextColor);
+        }
+        float left = mStrokeWidth * 0.5f;
+        float top = mStrokeWidth * 0.5f;
+        float right = mWidth - mStrokeWidth * 0.5f;
+        float bottom = mHeight - mStrokeWidth * 0.5f;
+
+        if (mStrokeWidth > 0) {
+            //外圍圓圈
+            canvas.drawRoundRect(new RectF(left, top, right, bottom), mStrokeRadius, mStrokeRadius, mStrokePaint);
+        }
+        //分隔線
+//        for (int i = 0; i < mTabNum - 1; i++) {
+//            canvas.drawLine(perWidth * (i + 1), top, perWidth * (i + 1), bottom, mStrokePaint);
+//        }
+        //draw tab and line
+        for (int i = 0; i < mTabNum; i++) {
+            String tabText = mTabTexts[i];
+            float tabTextWidth = mSelectedTextPaint.measureText(tabText);
+            if (i == mSelectedTab) {
+                // draw selected text
+                canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
+                        mTextHeightOffset, mSelectedTextPaint);
+            } else {
+                //draw unselected text
+                canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
+                        mTextHeightOffset, mUnselectedTextPaint);
+            }
+        }
+    }
+
+    private void drawSquarePath(Canvas canvas, float top, float left, float bottom, float right, int i) {
+        if (i == 0) {
+            drawLeftPath(canvas, left, top, bottom);
+        } else if (i == mTabNum - 1) {
+            drawRightPath(canvas, top, right, bottom);
+        } else {
+            canvas.drawRect(new RectF(perWidth * i, top, perWidth * (i + 1), bottom), mFillPaint);
+        }
+    }
+
+    private void drawPath(Canvas canvas, float top, float left, float bottom, float right) {
+        left += perWidth * mOffset;
+        right += perWidth * mOffset;
+
+        Path path = new Path();
+        path.moveTo(left + mStrokeRadius, top);
+        path.lineTo(right - mStrokeRadius, top);
+        path.arcTo(new RectF(right - 2 * mStrokeRadius, bottom - 2 * mStrokeRadius, right, bottom), 90, -90);
+        path.arcTo(new RectF(right - 2 * mStrokeRadius, top, right, top + 2 * mStrokeRadius), 0, -90);
+        path.lineTo(right - mStrokeRadius, bottom);
+        path.lineTo(left + mStrokeRadius, bottom);
+        path.arcTo(new RectF(left, bottom - 2 * mStrokeRadius, left + 2 * mStrokeRadius, bottom), 90, 90);
+        path.arcTo(new RectF(left, top, left + 2 * mStrokeRadius, top + 2 * mStrokeRadius), 180, 90);
+        canvas.drawPath(path, mFillPaint);
+    }
+
+    /**
+     * draw right path
+     *
+     * @param canvas
+     * @param left
+     * @param top
+     * @param bottom
+     */
+    private void drawLeftPath(Canvas canvas, float left, float top, float bottom) {
+        Path leftPath = new Path();
+        leftPath.moveTo(left + mStrokeRadius, top);
+        leftPath.lineTo(perWidth, top);
+        leftPath.lineTo(perWidth, bottom);
+        leftPath.lineTo(left + mStrokeRadius, bottom);
+        leftPath.arcTo(new RectF(left, bottom - 2 * mStrokeRadius, left + 2 * mStrokeRadius, bottom), 90, 90);
+        leftPath.lineTo(left, top + mStrokeRadius);
+        leftPath.arcTo(new RectF(left, top, left + 2 * mStrokeRadius, top + 2 * mStrokeRadius), 180, 90);
+        canvas.drawPath(leftPath, mFillPaint);
+    }
+
+    /**
+     * draw left path
+     *
+     * @param canvas
+     * @param top
+     * @param right
+     * @param bottom
+     */
+    private void drawRightPath(Canvas canvas, float top, float right, float bottom) {
+        Path rightPath = new Path();
+        rightPath.moveTo(right - mStrokeRadius, top);
+        rightPath.lineTo(right - perWidth, top);
+        rightPath.lineTo(right - perWidth, bottom);
+        rightPath.lineTo(right - mStrokeRadius, bottom);
+        rightPath.arcTo(new RectF(right - 2 * mStrokeRadius, bottom - 2 * mStrokeRadius, right, bottom), 90, -90);
+        rightPath.lineTo(right, top + mStrokeRadius);
+        rightPath.arcTo(new RectF(right - 2 * mStrokeRadius, top, right, top + 2 * mStrokeRadius), 0, -90);
+        canvas.drawPath(rightPath, mFillPaint);
+    }
+
+    @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int defaultWidth = getDefaultWidth();
         int defaultHeight = getDefaultHeight();
@@ -166,7 +273,6 @@ public class MultiSwitchBtn extends View {
         int totalPadding = (getPaddingRight() + getPaddingLeft()) * tabs;
         return (int) (totalTextWidth + totalStrokeWidth + totalPadding);
     }
-
 
     /**
      * get expect size
