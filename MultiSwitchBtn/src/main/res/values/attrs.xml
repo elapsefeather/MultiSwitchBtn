@@ -15,5 +15,9 @@
         <attr name="typeface" format="string" />
         <attr name="disableColor" format="color|reference" />
         <attr name="disableTextColor" format="color|reference" />
+        <attr name="blockStyle">
+            <enum name="original" value="0" />
+            <enum name="brim" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

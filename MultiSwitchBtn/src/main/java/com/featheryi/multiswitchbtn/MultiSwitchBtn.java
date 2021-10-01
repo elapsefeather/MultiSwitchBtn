@@ -33,6 +33,31 @@ public class MultiSwitchBtn extends View {
     private static final int ENABLE_COLOR = 0xffffffff;
     private static final int SELECTED_TAB = 0;
     private static final String FONTS_DIR = "fonts/";
+    private BlockStyle mblockStyle = BlockStyle.ORIGINAL;
+
+    public enum BlockStyle {
+        ORIGINAL(0),
+        BRIN(1);
+
+        private int mValue;
+
+        BlockStyle(int _value) {
+            this.mValue = _value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static BlockStyle fromId(int id) {
+            for (BlockStyle type : values()) {
+                if (type.getValue() == id) {
+                    return type;
+                }
+            }
+            return null;
+        }
+    }
 
     /*other*/
     private Paint mStrokePaint;
@@ -98,6 +123,7 @@ public class MultiSwitchBtn extends View {
         mUnSelectedTextColor = typedArray.getColor(R.styleable.MultiSwitchBtn_unselectedTextColor, DISABLE_COLOR);
         mDisableTextColor = typedArray.getColor(R.styleable.MultiSwitchBtn_disableTextColor, DISABLE_COLOR);
         mSelectedTab = typedArray.getInteger(R.styleable.MultiSwitchBtn_selectedTab, SELECTED_TAB);
+        mblockStyle = BlockStyle.fromId(typedArray.getInteger(R.styleable.MultiSwitchBtn_blockStyle, BlockStyle.ORIGINAL.getValue()));
         String mTypeface = typedArray.getString(R.styleable.MultiSwitchBtn_typeface);
         int mSwitchTabsResId = typedArray.getResourceId(R.styleable.MultiSwitchBtn_switchTabs, 0);
         if (mSwitchTabsResId != 0) {
@@ -457,6 +483,17 @@ public class MultiSwitchBtn extends View {
             throw new IllegalArgumentException("the size of tagTexts should greater then 0");
         }
     }
+
+    public MultiSwitchBtn setBlockStyle(int blockStyle) {
+        if (BlockStyle.fromId(blockStyle) != null) {
+            mblockStyle = BlockStyle.fromId(blockStyle);
+            requestLayout();
+            return this;
+        } else {
+            throw new IllegalArgumentException("the blockStyle of ROUNDED or BRIN");
+        }
+    }
+
     /*======================================save and restore======================================*/
 
     @Override
@@ -476,6 +513,7 @@ public class MultiSwitchBtn extends View {
         bundle.putInt("DisableTextColor", mDisableTextColor);
         bundle.putInt("SelectedTab", mSelectedTab);
         bundle.putBoolean("Enable", mEnable);
+        bundle.putInt("BlockStyle", mblockStyle.getValue());
         return bundle;
     }
 
@@ -496,6 +534,7 @@ public class MultiSwitchBtn extends View {
             mDisableTextColor = bundle.getInt("DisableTextColor");
             mSelectedTab = bundle.getInt("SelectedTab");
             mEnable = bundle.getBoolean("Enable");
+            mblockStyle = BlockStyle.fromId(bundle.getInt("BlockStyle", 0));
             super.onRestoreInstanceState(bundle.getParcelable("View"));
         } else {
             super.onRestoreInstanceState(state);
