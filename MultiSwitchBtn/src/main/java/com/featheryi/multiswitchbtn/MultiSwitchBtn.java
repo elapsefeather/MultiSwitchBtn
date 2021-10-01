@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -60,6 +61,8 @@ public class MultiSwitchBtn extends View {
 
     private float mOffset; //滑动偏移量
     private int lastValue = -1;
+
+    private OnSwitchListener onSwitchListener;
 
     public MultiSwitchBtn(Context context) {
         this(context, null);
@@ -325,6 +328,63 @@ public class MultiSwitchBtn extends View {
         if (mStrokeRadius > 0.5f * mHeight) {
             mStrokeRadius = 0.5f * mHeight;
         }
+    }
+
+    /**
+     * receive the event when touched
+     *
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!mEnable) {
+            return true;
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            float x = event.getX();
+            for (int i = 0; i < mTabNum; i++) {
+                if (x > perWidth * i && x < perWidth * (i + 1)) {
+                    if (mSelectedTab == i) {
+                        return true;
+                    }
+                    mSelectedTab = i;
+                    if (onSwitchListener != null) {
+                        onSwitchListener.onSwitch(i, mTabTexts[i]);
+                    }
+                }
+            }
+            invalidate();
+        }
+        return true;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (enabled == isEnabled()) {
+            return;
+        }
+        mEnable = enabled;
+        invalidate();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return mEnable;
+    }
+
+    /*=========================================Interface=========================================*/
+
+    /**
+     * called when swtiched
+     */
+    public interface OnSwitchListener {
+        void onSwitch(int position, String tabText);
+    }
+
+    public MultiSwitchBtn setOnSwitchListener(OnSwitchListener onSwitchListener) {
+        this.onSwitchListener = onSwitchListener;
+        return this;
     }
 
     /*======================================save and restore======================================*/
