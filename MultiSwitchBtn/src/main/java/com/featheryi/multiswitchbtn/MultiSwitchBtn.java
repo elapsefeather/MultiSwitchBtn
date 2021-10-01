@@ -69,6 +69,7 @@ public class MultiSwitchBtn extends View {
     public MultiSwitchBtn(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initAttrs(context, attrs);
+        initPaint();
     }
 
     /**
@@ -101,6 +102,123 @@ public class MultiSwitchBtn extends View {
             typeface = Typeface.createFromAsset(context.getAssets(), FONTS_DIR + mTypeface);
         }
         typedArray.recycle();
+    }
+
+    /**
+     * define paints
+     */
+    private void initPaint() {
+        // round rectangle paint
+        mStrokePaint = new Paint();
+        mStrokePaint.setColor(mSelectedColor);
+        mStrokePaint.setStyle(Paint.Style.STROKE);
+        mStrokePaint.setAntiAlias(true);
+        mStrokePaint.setStrokeWidth(mStrokeWidth);
+        // selected paint
+        mFillPaint = new Paint();
+        mFillPaint.setColor(mSelectedColor);
+        mFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mStrokePaint.setAntiAlias(true);
+        // selected text paint
+        mSelectedTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mSelectedTextPaint.setTextSize(mTextSize);
+        mSelectedTextPaint.setColor(mSelectedTextColor);
+        mStrokePaint.setAntiAlias(true);
+        // unselected text paint
+        mUnselectedTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mUnselectedTextPaint.setTextSize(mTextSize);
+        mUnselectedTextPaint.setColor(mUnSelectedTextColor);
+        mStrokePaint.setAntiAlias(true);
+        mTextHeightOffset = -(mSelectedTextPaint.ascent() + mSelectedTextPaint.descent()) * 0.5f;
+        mFontMetrics = mSelectedTextPaint.getFontMetrics();
+        if (typeface != null) {
+            mSelectedTextPaint.setTypeface(typeface);
+            mUnselectedTextPaint.setTypeface(typeface);
+        }
+    }
+
+    @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int defaultWidth = getDefaultWidth();
+        int defaultHeight = getDefaultHeight();
+        setMeasuredDimension(getExpectSize(defaultWidth, widthMeasureSpec), getExpectSize(defaultHeight,
+                heightMeasureSpec));
+    }
+
+    /**
+     * get default height when android:layout_height="wrap_content"
+     */
+    private int getDefaultHeight() {
+        return (int) (mFontMetrics.bottom - mFontMetrics.top) + getPaddingTop() + getPaddingBottom();
+    }
+
+    /**
+     * get default width when android:layout_width="wrap_content"
+     */
+    private int getDefaultWidth() {
+        float tabTextWidth = 0f;
+        int tabs = mTabTexts.length;
+        for (int i = 0; i < tabs; i++) {
+            tabTextWidth = Math.max(tabTextWidth, mSelectedTextPaint.measureText(mTabTexts[i]));
+        }
+        float totalTextWidth = tabTextWidth * tabs;
+        float totalStrokeWidth = (mStrokeWidth * tabs);
+        int totalPadding = (getPaddingRight() + getPaddingLeft()) * tabs;
+        return (int) (totalTextWidth + totalStrokeWidth + totalPadding);
+    }
+
+
+    /**
+     * get expect size
+     *
+     * @param size
+     * @param measureSpec
+     * @return
+     */
+    private int getExpectSize(int size, int measureSpec) {
+        int result = size;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+        switch (specMode) {
+            case MeasureSpec.EXACTLY:
+                result = specSize;
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                result = size;
+                break;
+            case MeasureSpec.AT_MOST:
+                result = Math.min(size, specSize);
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    /**
+     * called after onMeasure
+     *
+     * @param w
+     * @param h
+     * @param oldw
+     * @param oldh
+     */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mWidth = getMeasuredWidth();
+        mHeight = getMeasuredHeight();
+        perWidth = mWidth / mTabNum;
+        checkAttrs();
+    }
+
+    /**
+     * check attribute whehere suitable
+     */
+    private void checkAttrs() {
+        if (mStrokeRadius > 0.5f * mHeight) {
+            mStrokeRadius = 0.5f * mHeight;
+        }
     }
 
     /*======================================save and restore======================================*/
