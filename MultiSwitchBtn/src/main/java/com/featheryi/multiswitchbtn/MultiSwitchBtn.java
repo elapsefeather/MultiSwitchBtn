@@ -196,6 +196,10 @@ public class MultiSwitchBtn extends View {
             String tabText = mTabTexts[i];
             float tabTextWidth = mSelectedTextPaint.measureText(tabText);
             if (i == mSelectedTab) {
+//                draw selected tab
+                if (mblockStyle == BlockStyle.BRIN) {
+                    drawSquarePath(canvas, top, left, bottom, right, i);
+                }
                 // draw selected text
                 canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
                         mTextHeightOffset, mSelectedTextPaint);
