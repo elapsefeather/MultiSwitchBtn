@@ -19,6 +19,7 @@
             <enum name="original" value="0" />
             <enum name="brim" value="1" />
             <enum name="rounded" value="2" />
+            <enum name="bottomLine" value="3" />
         </attr>
     </declare-styleable>
 </resources>
