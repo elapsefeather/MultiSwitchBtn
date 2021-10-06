@@ -96,10 +96,9 @@
         app:blockStyle="bottomLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rounded"
+        app:layout_constraintTop_toBottomOf="@id/bottomLine"
         app:selectedColor="#4CAF50"
         app:selectedTextColor="#009688"
-        app:strokeRadius="30dp"
         app:switchTabs="@array/tabArr"
         app:textSize="20dp" />
 
